@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>네이버 팀 출퇴근 관리</title>
+    <style>
+        table { width: 80%; border-collapse: collapse; margin: 20px auto; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        th { background-color: #4CAF50; color: white; }
+        .on-time { background-color: #c8e6c9; } /* 정상 출근/퇴근 */
+        .late { background-color: #ffcdd2; }    /* 지각/조퇴 */
+        .absent { background-color: #f0e68c; }  /* 결석 */
+        .button-container { display: flex; gap: 5px; justify-content: center; }
+        .button { padding: 5px 10px; font-size: 14px; cursor: pointer; }
+        #summary { width: 70%; margin: 20px auto; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">네이버 팀 출퇴근 현황</h2>
+    <p id="currentDateTime" style="text-align:center; font-weight: bold;"></p>
+    <div style="text-align:center; margin-top: 10px;">
+        <button class="button" onclick="initializeAttendance()">초기화</button>
+    </div>
+
+    <table id="attendanceTable">
+        <tr>
+            <th>이름</th>
+            <th>출근 시간</th>
+            <th>출근 상태</th>
+            <th>퇴근 시간</th>
+            <th>퇴근 상태</th>
+            <th>사유</th>
+            <th>작업</th>
+        </tr>
+
+        <!-- Sample row with buttons for each action -->
+        <tr data-name="강성준">
+            <td>강성준</td>
+            <td class="arrival-time">09:40</td>
+            <td class="arrival-status late">지각</td>
+            <td class="departure-time">18:00</td>
+            <td class="departure-status on-time">정상 퇴근</td>
+            <td class="reason">늦잠</td>
+            <td class="button-container">
+                <button class="button" onclick="updateStatus(this, '출근')">출근</button>
+                <button class="button" onclick="updateStatus(this, '퇴근')">퇴근</button>
+                <button class="button" onclick="updateStatus(this, '결석')">결석</button>
+            </td>
+        </tr>
+
+        <!-- Repeat for each team member -->
+
+        <tr data-name="강수민">
+            <td>강수민</td>
+            <td class="arrival-time">08:49</td>
+            <td class="arrival-status on-time">정상 출근</td>
+            <td class="departure-time">18:00</td>
+            <td class="departure-status on-time">정상 퇴근</td>
+            <td class="reason">x</td>
+            <td class="button-container">
+                <button class="button" onclick="updateStatus(this, '출근')">출근</button>
+                <button class="button" onclick="updateStatus(this, '퇴근')">퇴근</button>
+                <button class="button" onclick="updateStatus(this, '결석')">결석</button>
+            </td>
+        </tr>
+
+        <!-- Additional team members... -->
+        <tr data-name="김재현">
+            <td>김재현</td>
+            <td class="arrival-time">08:49</td>
+            <td class="arrival-status on-time">정상 출근</td>
+            <td class="departure-time">18:00</td>
+            <td class="departure-status on-time">정상 퇴근</td>
+            <td class="reason">x</td>
+            <td class="button-container">
+                <button class="button" onclick="updateStatus(this, '출근')">출근</button>
+                <button class="button" onclick="updateStatus(this, '퇴근')">퇴근</button>
+                <button class="button" onclick="updateStatus(this, '결석')">결석</button>
+            </td>
+        </tr>
+
+        <tr data-name="박홍석">
+            <td>박홍석</td>
+            <td class="arrival-time">08:49</td>
+            <td class="arrival-status on-time">정상 출근</td>
+            <td class="departure-time">18:00</td>
+            <td class="departure-status on-time">정상 퇴근</td>
+            <td class="reason">x</td>
+            <td class="button-container">
+                <button class="button" onclick="updateStatus(this, '출근')">출근</button>
+                <button class="button" onclick="updateStatus(this, '퇴근')">퇴근</button>
+                <button class="button" onclick="updateStatus(this, '결석')">결석</button>
+            </td>
+        </tr>
+
+        <tr data-name="양은정">
+            <td>양은정</td>
+            <td class="arrival-time">08:49</td>
+            <td class="arrival-status on-time">정상 출근</td>
+            <td class="departure-time">18:00</td>
+            <td class="departure-status on-time">정상 퇴근</td>
+            <td class="reason">x</td>
+            <td class="button-container">
+                <button class="button" onclick="updateStatus(this, '출근')">출근</button>
+                <button class="button" onclick="updateStatus(this, '퇴근')">퇴근</button>
+                <button class="button" onclick="updateStatus(this, '결석')">결석</button>
+            </td>
+        </tr>
+
+        <tr data-name="양지수">
+            <td>양지수</td>
+            <td class="arrival-time">08:49</td>
+            <td class="arrival-status on-time">정상 출근</td>
+            <td class="departure-time">18:00</td>
+            <td class="departure-status on-time">정상 퇴근</td>
+            <td class="reason">x</td>
+            <td class="button-container">
+                <button class="button" onclick="updateStatus(this, '출근')">출근</button>
+                <button class="button" onclick="updateStatus(this, '퇴근')">퇴근</button>
+                <button class="button" onclick="updateStatus(this, '결석')">결석</button>
+            </td>
+        </tr>
+
+        <tr data-name="장은지">
+            <td>장은지</td>
+            <td class="arrival-time">08:49</td>
+            <td class="arrival-status on-time">정상 출근</td>
+            <td class="departure-time">18:00</td>
+            <td class="departure-status on-time">정상 퇴근</td>
+            <td class="reason">x</td>
+            <td class="button-container">
+                <button class="button" onclick="updateStatus(this, '출근')">출근</button>
+                <button class="button" onclick="updateStatus(this, '퇴근')">퇴근</button>
+                <button class="button" onclick="updateStatus(this, '결석')">결석</button>
+            </td>
+        </tr>
+
+        <tr data-name="조하영">
+            <td>조하영</td>
+            <td class="arrival-time">08:49</td>
+            <td class="arrival-status on-time">정상 출근</td>
+            <td class="departure-time">18:00</td>
+            <td class="departure-status on-time">정상 퇴근</td>
+            <td class="reason">x</td>
+            <td class="button-container">
+                <button class="button" onclick="updateStatus(this, '출근')">출근</button>
+                <button class="button" onclick="updateStatus(this, '퇴근')">퇴근</button>
+                <button class="button" onclick="updateStatus(this, '결석')">결석</button>
+            </td>
+        </tr>
+
+    </table>
+
+    <br>
+    <!-- 오늘의 날짜 표시 영역 -->
+    <p id="todayDate" style="text-align:center; font-weight: bold; margin-top: 20px;"></p>
+
+    <br>
+    <!-- 요약 결과 표시 영역 -->
+    <div id="summary"></div>
+
+    <script>
+        // 현재 날짜와 시간 표시 함수
+        function displayCurrentDateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const currentDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            document.getElementById('currentDateTime').textContent = `현재 날짜 및 시간: ${currentDateTime}`;
+        }
+
+        // 오늘 날짜 표시 함수
+        function displayTodayDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayDate = `${year}년 ${month}월 ${day}일`;
+            document.getElementById('todayDate').textContent = `오늘의 날짜: ${todayDate}`;
+        }
+
+        // 1초마다 현재 날짜와 시간을 업데이트
+        setInterval(displayCurrentDateTime, 1000);
+
+        // 페이지 로드 시 오늘 날짜 표시
+        window.onload = function() {
+            displayTodayDate();
+            generateSummary();
+        };
+
+        // 현재 시간 형식 반환 함수
+        function getCurrentTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // 초기화 함수
+        function initializeAttendance() {
+            const password = prompt("초기화를 위해 비밀번호를 입력하세요:");
+            const correctPassword = "0000"; // 비밀번호 설정
+
+            if (password === correctPassword) {
+                const rows = document.querySelectorAll("#attendanceTable tr[data-name]");
+                rows.forEach(row => {
+                    row.querySelector('.arrival-time').textContent = 'x';
+                    row.querySelector('.arrival-status').textContent = '결석';
+                    row.querySelector('.arrival-status').className = 'arrival-status absent';
+                    
+                    row.querySelector('.departure-time').textContent = 'x';
+                    row.querySelector('.departure-status').textContent = '결석';
+                    row.querySelector('.departure-status').className = 'departure-status absent';
+                    
+                    row.querySelector('.reason').textContent = 'x';
+                });
+                generateSummary(); // 요약 정보 업데이트
+                alert("모든 출퇴근 정보가 초기화되었습니다.");
+            } else {
+                alert("비밀번호가 올바르지 않습니다.");
+            }
+        }
+
+        // 출근 및 퇴근 상태 판단 함수
+        function isLateArrival(time) {
+            return time > "09:10"; // 출근 기준 시간
+        }
+
+        function isEarlyDeparture(time) {
+            return time < "17:50"; // 퇴근 기준 시간
+        }
+
+        // 사유 입력 함수
+        function promptReason(reasonType) {
+            return prompt(`${reasonType} 사유를 입력하세요:`);
+        }
+
+        // 버튼 클릭 시 상태 업데이트
+        function updateStatus(button, action) {
+            const row = button.closest('tr');
+            const currentTime = getCurrentTime();
+            let reason = row.querySelector('.reason').textContent;  // 기존 사유를 유지
+
+            if (action === '출근') {
+                row.querySelector('.arrival-time').textContent = currentTime;
+
+                if (isLateArrival(currentTime)) {
+                    reason = promptReason("지각") || reason;  // 사유 입력 받거나 기존 사유 유지
+                    row.querySelector('.arrival-status').textContent = '지각';
+                    row.querySelector('.arrival-status').className = 'arrival-status late';
+                } else {
+                    row.querySelector('.arrival-status').textContent = '정상 출근';
+                    row.querySelector('.arrival-status').className = 'arrival-status on-time';
+                }
+                row.querySelector('.reason').textContent = reason;
+
+            } else if (action === '퇴근') {
+                row.querySelector('.departure-time').textContent = currentTime;
+
+                if (isEarlyDeparture(currentTime)) {
+                    reason = promptReason("조퇴") || reason;  // 사유 입력 받거나 기존 사유 유지
+                    row.querySelector('.departure-status').textContent = '조퇴';
+                    row.querySelector('.departure-status').className = 'departure-status late';
+                } else {
+                    row.querySelector('.departure-status').textContent = '정상 퇴근';
+                    row.querySelector('.departure-status').className = 'departure-status on-time';
+                }
+                row.querySelector('.reason').textContent = reason;
+
+            } else if (action === '결석') {
+                reason = promptReason("결석") || reason;  // 사유 입력 받거나 기존 사유 유지
+                row.querySelector('.arrival-time').textContent = 'x';
+                row.querySelector('.arrival-status').textContent = '결석';
+                row.querySelector('.arrival-status').className = 'arrival-status absent';
+
+                row.querySelector('.departure-time').textContent = 'x';
+                row.querySelector('.departure-status').textContent = '결석';
+                row.querySelector('.departure-status').className = 'departure-status absent';
+
+                row.querySelector('.reason').textContent = reason;
+            }
+
+            generateSummary();  // 상태 업데이트 후 요약 생성
+        }
+
+        // 요약 생성 함수
+        function generateSummary() {
+            const rows = document.querySelectorAll("#attendanceTable tr[data-name]");
+            let summaryText = "<h3>네이버팀 출근</h3><ul>";
+
+            rows.forEach(row => {
+                const name = row.querySelector("td:first-child").textContent;
+                const arrivalTime = row.querySelector(".arrival-time").textContent;
+                const arrivalStatus = row.querySelector(".arrival-status").textContent;
+                const reason = row.querySelector(".reason").textContent !== "x" ? `( 사유 - ${row.querySelector(".reason").textContent})` : "";
+
+                // 출근 요약
+                if (arrivalStatus == '정상 출근'){
+                    summaryText += `<li>${name} ${arrivalTime} ${arrivalStatus}</li>`    
+                } else if (arrivalStatus == '결석'){
+                    summaryText += `<li>${name} ${arrivalStatus} ${reason}</li>`
+                }else {
+                    summaryText += `<li>${name} ${arrivalTime} ${arrivalStatus} ${reason}</li>`
+                }
+        
+            });
+
+            summaryText += "</ul><h3>네이버팀 퇴근</h3><ul>";
+
+            rows.forEach(row => {
+                const name = row.querySelector("td:first-child").textContent;
+                const departureTime = row.querySelector(".departure-time").textContent;
+                const departureStatus = row.querySelector(".departure-status").textContent;
+                const reason = row.querySelector(".reason").textContent !== "x" ? `( 사유 - ${row.querySelector(".reason").textContent})` : "";
+
+                // 퇴근 요약
+                if (departureStatus == '정상 퇴근'){
+                    summaryText += `<li>${name} ${departureTime} ${departureStatus}</li>`    
+                } else if (departureStatus == '결석'){
+                    summaryText += `<li>${name} ${departureStatus} ${reason}</li>`
+                } else {
+                    summaryText += `<li>${name} ${departureTime} ${departureStatus} ${reason}</li>`;
+                }
+            });
+
+            summaryText += "</ul>";
+            document.getElementById("summary").innerHTML = summaryText;
+        }
+
+        // 페이지 로드 시 요약 생성
+        // window.onload = generateSummary;
+    </script>
+</body>
+</html>
